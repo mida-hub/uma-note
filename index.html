@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>uma-note | 週末600円競馬ノート</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans JP"', 'sans-serif'],
+          },
+          colors: {
+            turf: {
+              50: '#f2f8f4',
+              100: '#e0efe5',
+              600: '#2e7d47',
+              700: '#246338',
+              800: '#1d4f2d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #f8f7f4;
+      color: #1f2937;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-24">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-stone-200 sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🐎</span>
+        <div>
+          <h1 class="text-lg font-black tracking-tight text-stone-800 leading-none">uma-note</h1>
+          <p class="text-[11px] text-stone-500 font-medium mt-0.5">日曜メインを600円で楽しむノート</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="openImportBtn" class="text-xs font-bold px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 transition">
+          📋 出馬表を取り込む
+        </button>
+      </div>
+    </div>
+
+    <!-- Race Info Bar -->
+    <div id="raceHeader" class="bg-turf-800 text-white px-4 py-2.5">
+      <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="bg-amber-400 text-stone-900 font-black px-2 py-0.5 rounded text-[11px]">GII</span>
+          <span id="raceName" class="font-bold text-sm">サンデーカップ (サンプル)</span>
+        </div>
+        <div class="flex items-center gap-2 text-turf-100">
+          <span id="raceCourse" class="bg-turf-700 px-2 py-0.5 rounded">東京</span>
+          <span id="raceSurfaceDist" class="bg-turf-700 px-2 py-0.5 rounded font-bold text-white">芝2000m</span>
+          <span id="raceCondition" class="bg-turf-700 px-2 py-0.5 rounded">良馬場</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-5xl mx-auto px-4 flex border-t border-stone-100 bg-white">
+      <button data-tab="list" class="tab-btn flex-1 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-turf-600 text-turf-700 transition">
+        🐎 出走馬一覧
+      </button>
+      <button data-tab="compare" class="tab-btn flex-1 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-stone-500 hover:text-stone-800 transition">
+        📌 気になる比較 <span id="pinCountBadge" class="ml-1 bg-stone-200 text-stone-700 px-1.5 py-0.5 rounded-full text-[10px]">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto px-4 py-5">
+
+    <!-- Tab 1: 出走馬一覧 -->
+    <section id="tab-list" class="tab-panel space-y-3">
+      <div class="flex items-center justify-between text-xs text-stone-500 mb-2">
+        <p>💡 今回の条件（<span id="highlightCondText" class="font-bold text-turf-700">芝2000m・良</span>）に合う戦績がハイライトされます</p>
+        <div class="flex items-center gap-2">
+          <label class="flex items-center gap-1 cursor-pointer">
+            <input type="checkbox" id="filterPinned" class="rounded text-turf-600">
+            <span>📌のみ表示</span>
+          </label>
+        </div>
+      </div>
+      <div id="horseListContainer" class="grid grid-cols-1 gap-3.5">
+        <!-- Horse cards rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Tab 2: 気になる比較モード -->
+    <section id="tab-compare" class="tab-panel hidden">
+      <div id="compareEmptyState" class="bg-white rounded-2xl p-8 text-center border border-stone-200">
+        <p class="text-3xl mb-2">📌</p>
+        <h2 class="font-bold text-stone-800 mb-1">気になる馬をピン留めしよう</h2>
+        <p class="text-xs text-stone-500 mb-4">出走馬一覧から「📌 気になる」を押すと、ここに絞り込んで表示されます。</p>
+        <button onclick="switchTab('list')" class="text-xs font-bold bg-turf-600 text-white px-4 py-2 rounded-full hover:bg-turf-700 transition">
+          出走馬を見に行く
+        </button>
+      </div>
+      <div id="compareGrid" class="grid grid-cols-1 gap-3.5">
+        <!-- Comparison cards rendered by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Horse Detail Modal -->
+  <div id="detailModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-5 shadow-xl">
+      <div class="flex items-start justify-between mb-3">
+        <div id="modalTitleArea"></div>
+        <button onclick="closeDetailModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold px-2">&times;</button>
+      </div>
+      <div id="modalBody" class="space-y-4 text-sm"></div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div id="importModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-xl">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-base text-stone-800">📋 出馬表テキストを取り込む</h3>
+        <button onclick="closeImportModal()" class="text-stone-400 hover:text-stone-700 text-xl font-bold px-2">&times;</button>
+      </div>
+      <p class="text-xs text-stone-500 mb-3">
+        JRA出馬表ページのURLを入力して読み込みます。
+      </p>
+      <div class="flex gap-2 mb-2">
+        <input id="importUrlInput" type="url" placeholder="https://www.jra.go.jp/JRADB/accessD.html?CNAME=..." class="flex-1 text-xs border border-stone-300 rounded-lg px-3 py-2">
+        <button onclick="importFromUrl()" class="text-xs font-bold text-white bg-turf-600 hover:bg-turf-700 px-4 py-2 rounded-lg transition whitespace-nowrap">
+          URL取得
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
