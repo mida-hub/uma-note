@@ -465,11 +465,17 @@ window.importFromUrl = async function() {
     }
     const horses = parseJraText(data.text);
     if (horses.length > 0) {
+      const isDifferentRace = currentRace.sourceUrl !== url;
       currentRace = {
         ...SAMPLE_RACE,
         name: '取り込みレース (JRA出馬表)',
+        sourceUrl: url,
         horses
       };
+      if (isDifferentRace) {
+        pinnedNums = [];
+        horseMemos = {};
+      }
       saveState();
       closeImportModal();
       renderAll();
